@@ -29,6 +29,7 @@
 #include <Cocoa/Cocoa.h>
 #include <errno.h>
 #include "llopenglview-objc.h"
+#include "llmetalview-objc.h"
 #include "llwindowmacosx-objc.h"
 #include "llappdelegate-objc.h"
 
@@ -222,9 +223,18 @@ NSWindowRef createNSWindow(int x, int y, int width, int height)
 
 GLViewRef createOpenGLView(NSWindowRef window, unsigned int samples, bool vsync)
 {
-	LLOpenGLView *glview = [[LLOpenGLView alloc]initWithFrame:[(LLNSWindow*)window frame] withSamples:samples andVsync:vsync];
-	[(LLNSWindow*)window setContentView:glview];
-	return glview;
+        LLOpenGLView *glview = [[LLOpenGLView alloc]initWithFrame:[(LLNSWindow*)window frame] withSamples:samples andVsync:vsync];
+        [(LLNSWindow*)window setContentView:glview];
+        return glview;
+}
+
+GLViewRef createMetalView(NSWindowRef window, id<MTLDevice> device, id<MTLCommandQueue> queue)
+{
+    LLMetalView *mview = [[LLMetalView alloc] initWithFrame:[(LLNSWindow*)window frame]
+                                                         device:device
+                                                   commandQueue:queue];
+    [(LLNSWindow*)window setContentView:mview];
+    return mview;
 }
 
 void setResizeMode(bool oldresize, void* glview)
@@ -380,8 +390,15 @@ void closeWindow(NSWindowRef window)
 
 void removeGLView(GLViewRef view)
 {
-	[(LLOpenGLView*)view clearGLContext];
-	[(LLOpenGLView*)view removeFromSuperview];
+#if LL_METAL
+    if ([(__bridge NSObject*)view isKindOfClass:[LLMetalView class]])
+    {
+        [(LLMetalView*)view removeFromSuperview];
+        return;
+    }
+#endif
+    [(LLOpenGLView*)view clearGLContext];
+    [(LLOpenGLView*)view removeFromSuperview];
 }
 
 void setupInputWindow(NSWindowRef window, GLViewRef glview)
@@ -391,11 +408,23 @@ void setupInputWindow(NSWindowRef window, GLViewRef glview)
 
 void commitCurrentPreedit(GLViewRef glView)
 {
-	[(LLOpenGLView*)glView commitCurrentPreedit];
+#if LL_METAL
+    if ([(__bridge NSObject*)glView isKindOfClass:[LLMetalView class]])
+    {
+        return;
+    }
+#endif
+    [(LLOpenGLView*)glView commitCurrentPreedit];
 }
 
 void allowDirectMarkedTextInput(bool allow, GLViewRef glView)
 {
+#if LL_METAL
+    if ([(__bridge NSObject*)glView isKindOfClass:[LLMetalView class]])
+    {
+        return;
+    }
+#endif
     [(LLOpenGLView*)glView allowMarkedTextInput:allow];
 }
 

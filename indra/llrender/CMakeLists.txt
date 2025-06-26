@@ -30,6 +30,7 @@ set(llrender_SOURCE_FILES
     llrendersphere.cpp
     llrendertarget.cpp
     llshadermgr.cpp
+    $<$<PLATFORM_ID:Darwin>:llrendermetal.mm>
     lltexture.cpp
     lltexturemanagerbridge.cpp
     lluiimage.cpp
@@ -61,6 +62,7 @@ set(llrender_HEADER_FILES
     llrender2dutils.h
     llrendernavprim.h
     llrendersphere.h
+    $<$<PLATFORM_ID:Darwin>:llrendermetal.h>
     llshadermgr.h
     lltexture.h
     lltexturemanagerbridge.h
@@ -109,4 +111,10 @@ target_link_libraries(llrender
         OpenGL::GL
         OpenGL::GLU
         )
+
+if (DARWIN AND USE_METAL)
+  find_library(METAL_LIBRARY Metal)
+  target_link_libraries(llrender ${METAL_LIBRARY})
+  target_compile_definitions(llrender PUBLIC LL_METAL=1)
+endif()
 

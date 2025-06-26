@@ -151,6 +151,7 @@ public:
 
     // enable or disable multithreaded GL
     static void setUseMultGL(bool use_mult_gl);
+    static void setUseMetal(bool use_metal);
 
 protected:
     LLWindowMacOSX(LLWindowCallbacks* callbacks,
@@ -242,6 +243,7 @@ protected:
 
 public:
     static bool sUseMultGL;
+    static bool sUseMetal;
 
     friend class LLWindowManager;
 

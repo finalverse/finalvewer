@@ -106,8 +106,11 @@ void setTitleCocoa(NSWindowRef window, const std::string &title);   // <FS:CR> S
 NSWindowRef createNSWindow(int x, int y, int width, int height);
 
 #include <OpenGL/OpenGL.h>
+#import <Metal/Metal.h>
+#import "llmetalview-objc.h"
 
 GLViewRef createOpenGLView(NSWindowRef window, unsigned int samples, bool vsync);
+GLViewRef createMetalView(NSWindowRef window, id<MTLDevice> device, id<MTLCommandQueue> queue);
 void glSwapBuffers(void* context);
 CGLContextObj getCGLContextObj(GLViewRef view);
 unsigned long getVramSize(GLViewRef view);

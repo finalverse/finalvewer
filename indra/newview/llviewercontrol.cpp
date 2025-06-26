@@ -595,6 +595,12 @@ static bool handleAppleUseMultGLChanged(const LLSD& newvalue)
     }
     return true;
 }
+
+static bool handleUseMetalChanged(const LLSD& newvalue)
+{
+    LLWindowMacOSX::setUseMetal(newvalue.asBoolean());
+    return true;
+}
 #endif
 
 static bool handleHeroProbeResolutionChanged(const LLSD &newvalue)
@@ -1320,6 +1326,7 @@ void settings_setup_listeners()
     // setting_setup_signal_listener(gSavedSettings, "RenderReflectionsEnabled", handleReflectionsEnabled); // <FS:Beq/> FIRE-33659 better way to enable/disable reflections
 #if LL_DARWIN
     setting_setup_signal_listener(gSavedSettings, "RenderAppleUseMultGL", handleAppleUseMultGLChanged);
+    setting_setup_signal_listener(gSavedSettings, "RenderUseMetal", handleUseMetalChanged);
 #endif
     setting_setup_signal_listener(gSavedSettings, "RenderScreenSpaceReflections", handleReflectionProbeDetailChanged);
     setting_setup_signal_listener(gSavedSettings, "RenderMirrors", handleReflectionProbeDetailChanged);

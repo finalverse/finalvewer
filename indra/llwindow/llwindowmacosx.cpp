@@ -71,6 +71,7 @@ namespace
 //
 
 bool LLWindowMacOSX::sUseMultGL = false;
+bool LLWindowMacOSX::sUseMetal = false;
 
 //static
 void LLWindowMacOSX::setUseMultGL(bool use_mult_gl)
@@ -105,6 +106,12 @@ void LLWindowMacOSX::setUseMultGL(bool use_mult_gl)
             LL_INFOS("GLInit") << "Multi-threaded OpenGL disabled." << LL_ENDL;
         }
     }
+}
+
+//static
+void LLWindowMacOSX::setUseMetal(bool use_metal)
+{
+    sUseMetal = use_metal;
 }
 
 // Cross-platform bits:
@@ -749,36 +756,45 @@ bool LLWindowMacOSX::createContext(int x, int y, int width, int height, int bits
 
     if(mContext == NULL)
     {
-        // Our OpenGL view is already defined within SecondLife.xib.
-        // Get the view instead.
-        mGLView = createOpenGLView(mWindow, mFSAASamples, enable_vsync);
-        mContext = getCGLContextObj(mGLView);
-        gGLManager.mVRAM = getVramSize(mGLView);
-
-        if(!mPixelFormat)
+#if LL_METAL
+        if (sUseMetal)
         {
-            CGLPixelFormatAttribute attribs[] =
+            mGLView = createMetalView(mWindow, nil, nil);
+        }
+        else
+#endif
+        {
+            // Our OpenGL view is already defined within SecondLife.xib.
+            // Get the view instead.
+            mGLView = createOpenGLView(mWindow, mFSAASamples, enable_vsync);
+            mContext = getCGLContextObj(mGLView);
+            gGLManager.mVRAM = getVramSize(mGLView);
+
+            if(!mPixelFormat)
             {
-                kCGLPFANoRecovery,
-                kCGLPFADoubleBuffer,
-                kCGLPFAClosestPolicy,
-                kCGLPFAAccelerated,
-                kCGLPFAMultisample,
-                kCGLPFASampleBuffers, static_cast<CGLPixelFormatAttribute>((mFSAASamples > 0 ? 1 : 0)),
-                kCGLPFASamples, static_cast<CGLPixelFormatAttribute>(mFSAASamples),
-                kCGLPFAStencilSize, static_cast<CGLPixelFormatAttribute>(8),
-                kCGLPFADepthSize, static_cast<CGLPixelFormatAttribute>(24),
-                kCGLPFAAlphaSize, static_cast<CGLPixelFormatAttribute>(8),
-                kCGLPFAColorSize, static_cast<CGLPixelFormatAttribute>(24),
-                kCGLPFAOpenGLProfile, static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_GL4_Core),
-                static_cast<CGLPixelFormatAttribute>(0)
-            };
+                CGLPixelFormatAttribute attribs[] =
+                {
+                    kCGLPFANoRecovery,
+                    kCGLPFADoubleBuffer,
+                    kCGLPFAClosestPolicy,
+                    kCGLPFAAccelerated,
+                    kCGLPFAMultisample,
+                    kCGLPFASampleBuffers, static_cast<CGLPixelFormatAttribute>((mFSAASamples > 0 ? 1 : 0)),
+                    kCGLPFASamples, static_cast<CGLPixelFormatAttribute>(mFSAASamples),
+                    kCGLPFAStencilSize, static_cast<CGLPixelFormatAttribute>(8),
+                    kCGLPFADepthSize, static_cast<CGLPixelFormatAttribute>(24),
+                    kCGLPFAAlphaSize, static_cast<CGLPixelFormatAttribute>(8),
+                    kCGLPFAColorSize, static_cast<CGLPixelFormatAttribute>(24),
+                    kCGLPFAOpenGLProfile, static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_GL4_Core),
+                    static_cast<CGLPixelFormatAttribute>(0)
+                };
 
-            GLint numPixelFormats;
-            CGLChoosePixelFormat (attribs, &mPixelFormat, &numPixelFormats);
-
-            if(mPixelFormat == NULL) {
+                GLint numPixelFormats;
                 CGLChoosePixelFormat (attribs, &mPixelFormat, &numPixelFormats);
+
+                if(mPixelFormat == NULL) {
+                    CGLChoosePixelFormat (attribs, &mPixelFormat, &numPixelFormats);
+                }
             }
         }
 
@@ -812,7 +828,9 @@ bool LLWindowMacOSX::createContext(int x, int y, int width, int height, int bits
     // Disable vertical sync for swap
     toggleVSync(enable_vsync);
 
+#if !LL_METAL
     setUseMultGL(sUseMultGL);
+#endif
 
     makeFirstResponder(mWindow, mGLView);
 
@@ -829,7 +847,7 @@ bool LLWindowMacOSX::switchContext(bool fullscreen, const LLCoordScreen &size, b
 
 void LLWindowMacOSX::destroyContext()
 {
-    if (!mContext)
+    if (!mContext && !sUseMetal)
     {
         // We don't have a context
         return;
@@ -842,17 +860,20 @@ void LLWindowMacOSX::destroyContext()
     }
 
     // Clean up remaining GL state before blowing away window
-    gGLManager.shutdownGL();
+    if (!sUseMetal)
+    {
+        gGLManager.shutdownGL();
+    }
 
     // Clean up the pixel format
-    if(mPixelFormat != NULL)
+    if(!sUseMetal && mPixelFormat != NULL)
     {
         CGLDestroyPixelFormat(mPixelFormat);
         mPixelFormat = NULL;
     }
 
     // Clean up the GL context
-    if(mContext != NULL)
+    if(!sUseMetal && mContext != NULL)
     {
         CGLDestroyContext(mContext);
     }

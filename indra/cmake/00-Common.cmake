@@ -60,6 +60,8 @@ if(USE_LTO)
   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
+set(USE_METAL OFF CACHE BOOL "Enable Metal renderer on macOS")
+
 # Don't bother with a MinSizeRel or Debug builds.
 set(CMAKE_CONFIGURATION_TYPES "RelWithDebInfo;Release" CACHE STRING "Supported build types." FORCE)
 
