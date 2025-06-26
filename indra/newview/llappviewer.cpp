@@ -623,6 +623,7 @@ static void settings_to_globals()
 
 #if LL_DARWIN
     LLWindowMacOSX::sUseMultGL = gSavedSettings.getBOOL("RenderAppleUseMultGL");
+    LLWindowMacOSX::sUseMetal = gSavedSettings.getBOOL("RenderUseMetal");
     gHiDPISupport = gSavedSettings.getBOOL("RenderHiDPI");
 #endif
 }

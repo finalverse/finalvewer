@@ -108,12 +108,14 @@ if (DARWIN)
     llwindowmacosx.cpp
     llwindowmacosx-objc.mm
     llopenglview-objc.mm
+    llmetalview-objc.mm
     )
   list(APPEND llwindow_HEADER_FILES
     llkeyboardmacosx.h
     llwindowmacosx.h
     llwindowmacosx-objc.h
     llopenglview-objc.h
+    llmetalview-objc.h
     llappdelegate-objc.h
     )
 
@@ -193,6 +195,12 @@ endif (llwindow_HEADER_FILES)
 if (DARWIN)
   include(CMakeFindFrameworks)
   find_library(CARBON_LIBRARY Carbon)
-  target_link_libraries(llwindow ${CARBON_LIBRARY})
+  find_library(METAL_LIBRARY Metal)
+  find_library(QUARTZCORE_LIBRARY QuartzCore)
+  target_link_libraries(llwindow ${CARBON_LIBRARY} ${METAL_LIBRARY} ${QUARTZCORE_LIBRARY})
 endif (DARWIN)
+
+if (DARWIN AND USE_METAL)
+  target_compile_definitions(llwindow PUBLIC LL_METAL=1)
+endif()
 
