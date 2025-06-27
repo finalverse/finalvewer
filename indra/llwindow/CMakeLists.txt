@@ -104,8 +104,8 @@ endif (LINUX)
 
 if (DARWIN)
   list(APPEND llwindow_SOURCE_FILES
-    llkeyboardmacosx.cpp
-    llwindowmacosx.cpp
+    llkeyboardmacosx.mm
+    llwindowmacosx.mm
     llwindowmacosx-objc.mm
     llopenglview-objc.mm
     llmetalview-objc.mm
@@ -121,8 +121,8 @@ if (DARWIN)
 
   # We use a bunch of deprecated system APIs.
   set_source_files_properties(
-      llkeyboardmacosx.cpp
-      llwindowmacosx.cpp
+      llkeyboardmacosx.mm
+      llwindowmacosx.mm
       PROPERTIES
       COMPILE_FLAGS "-Wno-deprecated-declarations -fpascal-strings"
       )
