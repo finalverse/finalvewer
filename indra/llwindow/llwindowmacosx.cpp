@@ -759,7 +759,7 @@ bool LLWindowMacOSX::createContext(int x, int y, int width, int height, int bits
 #if LL_METAL
         if (sUseMetal)
         {
-            mGLView = createMetalView(mWindow, nil, nil);
+            mGLView = createMetalView(mWindow, NULL, NULL);
         }
         else
 #endif
@@ -2145,7 +2145,7 @@ struct HidDevice
 
 static void populate_device_info( io_object_t io_obj_p, CFDictionaryRef device_dic, HidDevice* devicep )
 {
-    CFMutableDictionaryRef io_properties = nil;
+    CFMutableDictionaryRef io_properties = NULL;
     io_registry_entry_t entry1;
     io_registry_entry_t entry2;
     kern_return_t rc;
@@ -2170,7 +2170,7 @@ static void populate_device_info( io_object_t io_obj_p, CFDictionaryRef device_d
     if ( KERN_SUCCESS == rc )
     {
         // IORegistryEntryCreateCFProperties() succeeded
-        if ( io_properties != nil )
+        if ( io_properties != NULL )
         {
             CFTypeRef dict_element = 0;
             // get device info

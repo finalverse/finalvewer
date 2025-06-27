@@ -106,11 +106,18 @@ void setTitleCocoa(NSWindowRef window, const std::string &title);   // <FS:CR> S
 NSWindowRef createNSWindow(int x, int y, int width, int height);
 
 #include <OpenGL/OpenGL.h>
+#ifdef __OBJC__
 #import <Metal/Metal.h>
+typedef id<MTLDevice> LLMetalDeviceRef;
+typedef id<MTLCommandQueue> LLMetalCommandQueueRef;
+#else
+typedef void* LLMetalDeviceRef;
+typedef void* LLMetalCommandQueueRef;
+#endif
 #import "llmetalview-objc.h"
 
 GLViewRef createOpenGLView(NSWindowRef window, unsigned int samples, bool vsync);
-GLViewRef createMetalView(NSWindowRef window, id<MTLDevice> device, id<MTLCommandQueue> queue);
+GLViewRef createMetalView(NSWindowRef window, LLMetalDeviceRef device, LLMetalCommandQueueRef queue);
 void glSwapBuffers(void* context);
 CGLContextObj getCGLContextObj(GLViewRef view);
 unsigned long getVramSize(GLViewRef view);
