@@ -114,7 +114,9 @@ typedef id<MTLCommandQueue> LLMetalCommandQueueRef;
 typedef void* LLMetalDeviceRef;
 typedef void* LLMetalCommandQueueRef;
 #endif
+#ifdef __OBJC__
 #import "llmetalview-objc.h"
+#endif
 
 GLViewRef createOpenGLView(NSWindowRef window, unsigned int samples, bool vsync);
 GLViewRef createMetalView(NSWindowRef window, LLMetalDeviceRef device, LLMetalCommandQueueRef queue);

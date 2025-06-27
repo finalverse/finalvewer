@@ -29,7 +29,14 @@
 
 #include "llwindow.h"
 #include "llwindowcallbacks.h"
+
+// Only include Objective-C headers when compiling as Objective-C++
+#ifdef __OBJC__
+#import "llwindowmacosx-objc.h"
+#import <Foundation/Foundation.h>
+#else
 #include "llwindowmacosx-objc.h"
+#endif
 
 #include "lltimer.h"
 
@@ -40,6 +47,13 @@
 #include "fix_macros.h"
 #undef verify
 #undef require
+
+// Forward declaration to avoid NSString in pure C++ compilation
+#ifdef __OBJC__
+void setupInputDevices(NSString* app_name);
+#else
+void setupInputDevices(void* app_name);
+#endif
 
 class LLWindowMacOSX : public LLWindow
 {
