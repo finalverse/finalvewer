@@ -2223,11 +2223,17 @@ endif()
 
 list(APPEND viewer_SOURCE_FILES ${viewer_HEADER_FILES})
 
-add_executable(${VIEWER_BINARY_NAME}
-    WIN32
-    MACOSX_BUNDLE
-    ${viewer_SOURCE_FILES}
-    )
+if (IOS)
+  add_library(${VIEWER_BINARY_NAME} SHARED
+      ${viewer_SOURCE_FILES}
+      )
+else ()
+  add_executable(${VIEWER_BINARY_NAME}
+      WIN32
+      MACOSX_BUNDLE
+      ${viewer_SOURCE_FILES}
+      )
+endif ()
 
 # add package files
 file(GLOB EVENT_HOST_SCRIPT_GLOB_LIST
@@ -2478,6 +2484,11 @@ elseif (DARWIN)
         # macOS into using the pre-Mojave display system, avoiding the blurry display that
         # otherwise occurs when upscaling the viewer to Retina resolution levels.
         LINK_FLAGS_RELEASE "${LINK_FLAGS_RELEASE} -Xlinker -platform_version -Xlinker macos -Xlinker ${CMAKE_OSX_DEPLOYMENT_TARGET} -Xlinker 10.12"
+        )
+elseif (IOS)
+    set_target_properties(${VIEWER_BINARY_NAME}
+        PROPERTIES
+        FRAMEWORK TRUE
         )
 else (WINDOWS)
         # Linux
