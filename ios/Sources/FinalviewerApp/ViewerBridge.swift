@@ -1,0 +1,56 @@
+/** 
+ * @file 
+ * @brief 
+ *
+ * $LicenseInfo:firstyear=2025&license=fsviewerlgpl$
+ * Finalviewer Viewer Source Code
+ * Copyright (C) 2025, The Finalviewer Project, Inc.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation;
+ * version 2.1 of the License only.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * The Finalviewer Project, Inc., 1831 Oakwood Drive, Fairmont, Minnesota 56031-3225 USA
+ * http://www.finalviewer.org
+ * $/LicenseInfo$
+ */
+
+
+import Foundation
+
+public enum ViewerCore {
+    public static func construct() {
+        ViewerBridge.constructViewer()
+    }
+
+    public static func initialize() -> Bool {
+        ViewerBridge.initViewer()
+    }
+
+    public static func pumpFrame() -> Bool {
+        ViewerBridge.pumpFrame()
+    }
+
+    public static func handle(url: String) {
+        ViewerBridge.handleURL(url)
+    }
+
+    public static func quit() {
+        ViewerBridge.quit()
+    }
+
+    public static func cleanup() {
+        ViewerBridge.cleanupViewer()
+    }
+}
+
