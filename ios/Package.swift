@@ -16,7 +16,12 @@ let package = Package(
                 .headerSearchPath("../../indra/newview")
             ],
             linkerSettings: [
-                .linkedLibrary("viewer")
+                .linkedLibrary("viewer"),
+                .linkedLibrary("BulletDynamics"),
+                .linkedLibrary("BulletCollision"),
+                .linkedLibrary("LinearMath"),
+                .linkedLibrary("fmod"),
+                .linkedFramework("AVFoundation")
             ]
         ),
         .executableTarget(
