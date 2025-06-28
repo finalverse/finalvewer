@@ -1857,6 +1857,16 @@ if (DARWIN)
   list(APPEND viewer_SOURCE_FILES ${viewer_RESOURCE_FILES})
 endif (DARWIN)
 
+if (IOS)
+  LIST(APPEND viewer_SOURCE_FILES llappviewerosx-ios-objc.mm)
+  LIST(APPEND viewer_SOURCE_FILES llappviewerosx-ios-objc.h)
+  set_source_files_properties(
+    llappviewerosx-ios-objc.mm
+    PROPERTIES
+    SKIP_PRECOMPILE_HEADERS TRUE
+  )
+endif (IOS)
+
 if (LINUX)
     LIST(APPEND viewer_SOURCE_FILES llappviewerlinux.cpp)
     set_source_files_properties(
