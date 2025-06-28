@@ -1,0 +1,25 @@
+name: iOS Build
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build-ios:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: brew install cmake
+      - name: Build viewer library for iOS
+        run: |
+          mkdir build-ios
+          cd build-ios
+          cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-iOS.cmake ../indra/newview
+          cmake --build . --config Release
+      - name: Build Swift package for simulator
+        run: |
+          xcodebuild -scheme FinalviewerApp -destination 'platform=iOS Simulator,name=iPhone 15' build
+      - name: Run UI tests
+        run: |
+          xcodebuild -scheme FinalviewerApp -destination 'platform=iOS Simulator,name=iPhone 15' test
