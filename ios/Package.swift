@@ -28,6 +28,11 @@ let package = Package(
             name: "FinalviewerApp",
             dependencies: ["ViewerBridge"],
             path: "Sources/FinalviewerApp"
+        ),
+        .testTarget(
+            name: "FinalviewerAppUITests",
+            dependencies: ["FinalviewerApp"],
+            path: "Tests/FinalviewerAppUITests"
         )
     ]
 )

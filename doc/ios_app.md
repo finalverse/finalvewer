@@ -1,5 +1,7 @@
 # Finalviewer iOS App
 
+[![iOS Build](https://github.com/finalviewer/finalviewer/actions/workflows/ios.yml/badge.svg)](https://github.com/finalviewer/finalviewer/actions/workflows/ios.yml)
+
 This folder contains a minimal Swift package that can be opened in Xcode to run the viewer core on iOS.
 
 ## Prerequisites
@@ -21,3 +23,13 @@ This folder contains a minimal Swift package that can be opened in Xcode to run 
 - Modify `Package.swift` if additional resource bundles are needed.
 
 The SwiftUI interface provides login, chat and HUD layers while `WorldView` uses SceneKit with gesture recognizers for camera control. The `ViewerBridge` layer exposes functions from the C++ core.
+
+## Running tests
+
+Run the UI tests on a simulator with:
+
+```bash
+xcodebuild -scheme FinalviewerApp -destination 'platform=iOS Simulator,name=iPhone 15' test
+```
+
+This matches the command executed by the continuous integration workflow.
