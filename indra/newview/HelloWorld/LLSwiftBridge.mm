@@ -21,6 +21,50 @@
 static NSDictionary* sLastReceivedMessage = nil;
 static BOOL sIsInitialized = NO;
 
+// Helper to setup directories and start the messaging system
+static bool initMessagingSubsystem()
+{
+    static bool sInited = false;
+    if (sInited)
+    {
+        return true;
+    }
+
+    LLCommon::initClass();
+
+#if ADDRESS_SIZE == 64
+    gDirUtilp->initAppDirs(APP_NAME + "_x64");
+#else
+    gDirUtilp->initAppDirs(APP_NAME);
+#endif
+
+    std::string template_path = gDirUtilp->getExpandedFilename(
+        LL_PATH_APP_SETTINGS, "message_template.msg");
+
+    const F32 heartbeat = 5.f;
+    const F32 timeout = 100.f;
+    const LLUseCircuitCodeResponder* responder = NULL;
+    bool failure_is_fatal = true;
+
+    if(!start_messaging_system(template_path,
+                               0,
+                               LLVersionInfo::instance().getMajor(),
+                               LLVersionInfo::instance().getMinor(),
+                               LLVersionInfo::instance().getPatch(),
+                               false,
+                               std::string(),
+                               responder,
+                               failure_is_fatal,
+                               heartbeat,
+                               timeout))
+    {
+        return false;
+    }
+
+    sInited = true;
+    return true;
+}
+
 // Custom message handler class
 class LLSwiftMessageHandler : public LLHTTPNode
 {
@@ -74,17 +118,11 @@ BOOL LLBridge_InitializeMessageSystem(void)
         }
         
         try {
-            // Initialize common systems
-            LLCommon::initClass();
-            
-            // Initialize message system
-            std::string message_template_path = gDirUtilp->getExpandedFilename(
-                LL_PATH_APP_SETTINGS, "message_template.msg");
-            
-            if (!gMessageSystem) {
-                gMessageSystem = new LLMessageSystem(message_template_path);
+            if (!initMessagingSubsystem()) {
+                NSLog(@"Failed to initialize messaging subsystem");
+                return NO;
             }
-            
+
             sIsInitialized = YES;
             return YES;
         }
