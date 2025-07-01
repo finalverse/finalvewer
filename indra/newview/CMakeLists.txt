@@ -3069,3 +3069,116 @@ endif (LL_TESTS)
 
 check_message_template(${VIEWER_BINARY_NAME})
 
+
+# HelloWorld Swift integration
+if (DARWIN)
+    # Define HelloWorld targets as part of Finalviewer
+    set(HELLOWORLD_IOS_TARGET "HelloWorld-iOS")
+    set(HELLOWORLD_MACOS_TARGET "HelloWorld-macOS")
+    
+    # Shared Swift sources
+    set(HELLOWORLD_SHARED_SOURCES
+        HelloWorld/Shared/Renderer.swift
+        HelloWorld/Shared/FinalviewerManager.swift
+        HelloWorld/Shared/TestConnectionView.swift
+        HelloWorld/Shared/ShaderTypes.h
+    )
+    
+    # Bridge files
+    set(HELLOWORLD_BRIDGE_SOURCES
+        HelloWorld/LLSwiftBridge.h
+        HelloWorld/LLSwiftBridge.mm
+    )
+    
+    # Resources
+    set(HELLOWORLD_RESOURCES
+        HelloWorld/Resources/ColorMap.png
+    )
+    
+    file(GLOB HELLOWORLD_ASSETS HelloWorld/Resources/Assets.xcassets/*)
+    list(APPEND HELLOWORLD_RESOURCES ${HELLOWORLD_ASSETS})
+    
+    # iOS Target
+    add_executable(${HELLOWORLD_IOS_TARGET} MACOSX_BUNDLE
+        ${HELLOWORLD_SHARED_SOURCES}
+        ${HELLOWORLD_BRIDGE_SOURCES}
+        HelloWorld/iOS/AppDelegate.swift
+        HelloWorld/iOS/GameViewController.swift
+        ${HELLOWORLD_RESOURCES}
+    )
+    
+    set_target_properties(${HELLOWORLD_IOS_TARGET} PROPERTIES
+        SWIFT_VERSION 5.0
+        XCODE_ATTRIBUTE_SWIFT_OBJC_BRIDGING_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld/HelloWorld-Bridging-Header.h"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld/iOS/Info.plist"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.finalviewer.helloworld.ios"
+        XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "iphonesimulator iphoneos"
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2"
+        RESOURCE "${HELLOWORLD_RESOURCES}"
+    )
+    
+    # macOS Target
+    add_executable(${HELLOWORLD_MACOS_TARGET} MACOSX_BUNDLE
+        ${HELLOWORLD_SHARED_SOURCES}
+        ${HELLOWORLD_BRIDGE_SOURCES}
+        HelloWorld/macOS/AppDelegate.swift
+        HelloWorld/macOS/GameViewController.swift
+        ${HELLOWORLD_RESOURCES}
+    )
+    
+    set_target_properties(${HELLOWORLD_MACOS_TARGET} PROPERTIES
+        SWIFT_VERSION 5.0
+        XCODE_ATTRIBUTE_SWIFT_OBJC_BRIDGING_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld/HelloWorld-Bridging-Header.h"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld/macOS/Info.plist"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.finalviewer.helloworld.macos"
+        XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "macosx"
+        RESOURCE "${HELLOWORLD_RESOURCES}"
+    )
+    
+    # Link both targets with Finalviewer libraries
+    foreach(target ${HELLOWORLD_IOS_TARGET} ${HELLOWORLD_MACOS_TARGET})
+        target_link_libraries(${target}
+            llcommon
+            llmessage
+            llcorehttp
+            llmath
+            llrender
+            llwindow
+            ${COCOA_LIBRARY}
+            "-framework Metal"
+            "-framework MetalKit"
+            "-framework ModelIO"
+        )
+        
+        # Add include directories
+        target_include_directories(${target} PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_SOURCE_DIR}/llcommon
+            ${CMAKE_SOURCE_DIR}/llmessage
+            ${CMAKE_SOURCE_DIR}/llmath
+            ${CMAKE_SOURCE_DIR}/llrender
+        )
+        
+        # Set deployment target
+        set_target_properties(${target} PROPERTIES
+            XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "13.0"
+            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "10.15"
+        )
+        
+        # Add to Finalviewer dependencies
+        add_dependencies(${target} llcommon llmessage llcorehttp)
+    endforeach()
+    
+    # Source grouping for Xcode
+    source_group("HelloWorld\\Shared" FILES ${HELLOWORLD_SHARED_SOURCES})
+    source_group("HelloWorld\\Bridge" FILES ${HELLOWORLD_BRIDGE_SOURCES})
+    source_group("HelloWorld\\Resources" FILES ${HELLOWORLD_RESOURCES})
+    source_group("HelloWorld\\iOS" FILES 
+        HelloWorld/iOS/AppDelegate.swift
+        HelloWorld/iOS/GameViewController.swift
+    )
+    source_group("HelloWorld\\macOS" FILES 
+        HelloWorld/macOS/AppDelegate.swift
+        HelloWorld/macOS/GameViewController.swift
+    )
+endif (DARWIN)
