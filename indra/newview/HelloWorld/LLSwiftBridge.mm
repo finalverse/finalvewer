@@ -15,7 +15,6 @@
 #include "llagent.h"
 #include "llviewercontrol.h"
 #include "llstartup.h"
-#include "llappviewer.h"
 
 // Message handler for capturing incoming messages
 static NSDictionary* sLastReceivedMessage = nil;
